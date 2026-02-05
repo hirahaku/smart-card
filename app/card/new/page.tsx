@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter, useSearchParams } from "next/navigation";
+import { User, ShieldCheck, Share2, Award, Laptop } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,10 +11,10 @@ const supabase = createClient(
 
 const InputField = ({ label, value, field, placeholder, type = "text", onChange }: any) => (
   <div className="mb-4">
-    <label className="block text-sm text-gray-400 mb-1">{label}</label>
+    <label className="block text-sm font-bold text-gray-400 mb-1 ml-1">{label}</label>
     <input
       type={type}
-      className="w-full bg-neutral-800 border border-neutral-700 p-3 rounded-xl text-white focus:outline-none focus:border-blue-500"
+      className="w-full bg-neutral-900 border border-neutral-800 p-4 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-600"
       value={value || ""}
       placeholder={placeholder}
       onChange={(e) => onChange(field, e.target.value)}
@@ -53,37 +54,67 @@ function NewCardForm() {
       alert(`作成失敗: ${error.message}`);
       setIsSubmitting(false);
     } else {
-      // 作成成功したら、そのIDで自動ログイン扱いにしてダッシュボードへ
       localStorage.setItem("login_card_id", profile.card_id);
       router.push(`/dashboard`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white pb-20 font-sans">
-      <header className="p-6 border-b border-neutral-800 text-center font-bold">初期セットアップ</header>
+    <div className="min-h-screen bg-neutral-950 text-white pb-20 font-sans selection:bg-blue-500/30">
+      <header className="p-8 text-center">
+        <h1 className="text-2xl font-black italic tracking-tighter bg-gradient-to-r from-blue-500 to-emerald-400 bg-clip-text text-transparent">
+          SMART CARD SETTING
+        </h1>
+        <p className="text-gray-500 text-xs mt-2 uppercase tracking-[0.2em]">初期セットアップ</p>
+      </header>
+
       <main className="p-6 max-w-md mx-auto">
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">必須情報</h2>
-          <InputField label="カードID (英数字)" value={profile.card_id} field="card_id" onChange={handleChange} />
-          <InputField label="パスワード" value={profile.password} field="password" type="password" onChange={handleChange} />
-          <InputField label="氏名" value={profile.full_name} field="full_name" onChange={handleChange} />
+        {/* 重要：セキュリティと基本情報 */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-4 text-blue-400">
+            <ShieldCheck size={18} />
+            <h2 className="text-xs font-black uppercase tracking-widest">必須・セキュリティ</h2>
+          </div>
+          <InputField label="カードID (半角英数字)" value={profile.card_id} field="card_id" placeholder="例: tanaka01" onChange={handleChange} />
+          <InputField label="管理用パスワード" value={profile.password} field="password" type="password" placeholder="編集時に必要です" onChange={handleChange} />
+          <InputField label="氏名" value={profile.full_name} field="full_name" placeholder="山田 太郎" onChange={handleChange} />
+          <InputField label="役職・肩書き" value={profile.job_title} field="job_title" placeholder="UX Designer / Manager" onChange={handleChange} />
         </section>
 
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">基本情報</h2>
-          <InputField label="役職" value={profile.job_title} field="job_title" onChange={handleChange} />
+        {/* スキル・資格 */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-4 text-emerald-400">
+            <Award size={18} />
+            <h2 className="text-xs font-black uppercase tracking-widest">スキル・資格</h2>
+          </div>
+          <InputField label="保有資格" value={profile.certifications} field="certifications" placeholder="例: 応用情報技術者, TOEIC 800" onChange={handleChange} />
+          <InputField label="主要スキル" value={profile.skills} field="skills" placeholder="例: React, Figma, 動画編集" onChange={handleChange} />
         </section>
 
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-emerald-400">SNS・連絡先</h2>
-          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" placeholder="@なし" onChange={handleChange} />
-          <InputField label="Instagram" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
-          <InputField label="Webサイト" value={profile.website_url} field="website_url" onChange={handleChange} />
+        {/* SNS・連絡先（すべて） */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 mb-4 text-purple-400">
+            <Share2 size={18} />
+            <h2 className="text-xs font-black uppercase tracking-widest">SNS・連絡先</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-1">
+            <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" placeholder="@なしのID" onChange={handleChange} />
+            <InputField label="Instagram ID" value={profile.instagram_id} field="instagram_id" placeholder="ユーザー名" onChange={handleChange} />
+            <InputField label="LINE ID" value={profile.line_id} field="line_id" placeholder="友達検索用ID" onChange={handleChange} />
+            <InputField label="TikTok ID" value={profile.tiktok_id} field="tiktok_id" placeholder="@ユーザー名" onChange={handleChange} />
+            <InputField label="YouTubeチャンネル" value={profile.youtube_id} field="youtube_id" placeholder="@channel_id" onChange={handleChange} />
+            <InputField label="電話番号" value={profile.phone} field="phone" placeholder="09012345678" onChange={handleChange} />
+            <InputField label="メールアドレス" value={profile.email} field="email" placeholder="example@mail.com" onChange={handleChange} />
+            <InputField label="Webサイト URL" value={profile.website_url} field="website_url" placeholder="https://..." onChange={handleChange} />
+          </div>
         </section>
 
-        <button onClick={handleCreate} disabled={issubmitting} className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-lg hover:bg-neutral-200 transition-colors">
-          {issubmitting ? "登録中..." : "この内容で登録する"}
+        <button 
+          onClick={handleCreate} 
+          disabled={issubmitting} 
+          className="w-full bg-white text-black font-black py-5 rounded-[2rem] shadow-xl hover:bg-neutral-200 active:scale-95 transition-all sticky bottom-6"
+        >
+          {issubmitting ? "登録中..." : "デジタル名刺を完成させる"}
         </button>
       </main>
     </div>
@@ -92,7 +123,7 @@ function NewCardForm() {
 
 export default function NewCard() {
   return (
-    <Suspense fallback={<div className="p-10 text-white text-center">Loading...</div>}>
+    <Suspense fallback={<div className="p-10 text-white text-center">読み込み中...</div>}>
       <NewCardForm />
     </Suspense>
   );
