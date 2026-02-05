@@ -25,7 +25,7 @@ export default function EditCard() {
   const { id } = useParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [inputPassword, setInputPassword] = useState(""); // 認証用パスワード
+  const [inputPassword, setInputPassword] = useState("");
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -42,17 +42,14 @@ export default function EditCard() {
   };
 
   const handleSave = async () => {
-    // セキュリティチェック：DBに保存されているパスワードと比較
     if (inputPassword !== profile.password) {
       alert("パスワードが正しくありません。");
       return;
     }
-
     const { error } = await supabase.from("profiles").update(profile).eq("card_id", id);
-    if (error) {
-      alert(`保存失敗: ${error.message}`);
-    } else {
-      alert("情報を更新しました！");
+    if (error) alert("保存失敗");
+    else {
+      alert("更新しました！");
       router.push(`/card/${id}`);
     }
   };
@@ -67,19 +64,8 @@ export default function EditCard() {
       </header>
 
       <main className="p-6 max-w-md mx-auto">
-        {/* パスワード認証セクション */}
         <section className="mb-10 p-5 bg-red-950/20 border border-red-900/30 rounded-3xl">
-          <h2 className="text-xs font-bold text-red-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            認証が必要です
-          </h2>
-          <InputField 
-            label="設定したパスワードを入力" 
-            value={inputPassword} 
-            field="password" 
-            type="password" 
-            placeholder="パスワード" 
-            onChange={(_:any, val:string) => setInputPassword(val)} 
-          />
+          <InputField label="編集用パスワード" value={inputPassword} field="password" type="password" onChange={(_:any, v:string) => setInputPassword(v)} />
         </section>
 
         <section className="mb-8">
@@ -89,21 +75,23 @@ export default function EditCard() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">連絡先・SNS</h2>
-          <InputField label="電話番号" value={profile.phone} field="phone" onChange={handleChange} />
-          <InputField label="メールアドレス" value={profile.email} field="email" onChange={handleChange} />
-          <InputField label="LINE ID" value={profile.line_id} field="line_id" onChange={handleChange} />
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-blue-400">スキル・資格</h2>
+          <InputField label="保有資格" value={profile.certifications} field="certifications" placeholder="例: 英検1級, 宅建" onChange={handleChange} />
+          <InputField label="スキル" value={profile.skills} field="skills" placeholder="例: 動画編集, Python" onChange={handleChange} />
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-emerald-400">SNS・動画</h2>
+          <InputField label="YouTubeチャンネルID" value={profile.youtube_id} field="youtube_id" placeholder="@channel_id" onChange={handleChange} />
+          <InputField label="TikTok ID" value={profile.tiktok_id} field="tiktok_id" placeholder="ユーザー名のみ" onChange={handleChange} />
           <InputField label="Instagram ID" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
-          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" onChange={handleChange} />
+          <InputField label="X ID" value={profile.x_id} field="x_id" onChange={handleChange} />
+          <InputField label="LINE ID" value={profile.line_id} field="line_id" onChange={handleChange} />
+          <InputField label="電話番号" value={profile.phone} field="phone" onChange={handleChange} />
           <InputField label="Webサイト" value={profile.website_url} field="website_url" onChange={handleChange} />
         </section>
         
-        <button 
-          onClick={handleSave} 
-          className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-transform"
-        >
-          変更を保存する
-        </button>
+        <button onClick={handleSave} className="w-full bg-white text-black font-black py-4 rounded-2xl">保存する</button>
       </main>
     </div>
   );

@@ -27,23 +27,15 @@ function NewCardForm() {
   const [issubmitting, setIsSubmitting] = useState(false);
   
   const [profile, setProfile] = useState<any>({
-    card_id: "", 
-    full_name: "",
-    job_title: "",
-    password: "", // パスワード項目を追加
-    phone: "",
-    email: "",
-    line_id: "",
-    instagram_id: "",
-    x_id: "",
-    website_url: "",
+    card_id: "", full_name: "", job_title: "", password: "",
+    phone: "", email: "", line_id: "", instagram_id: "",
+    x_id: "", website_url: "", tiktok_id: "", youtube_id: "",
+    skills: "", certifications: ""
   });
 
   useEffect(() => {
     const idFromUrl = searchParams.get("id");
-    if (idFromUrl) {
-      setProfile((prev: any) => ({ ...prev, card_id: idFromUrl }));
-    }
+    if (idFromUrl) setProfile((prev: any) => ({ ...prev, card_id: idFromUrl }));
   }, [searchParams]);
 
   const handleChange = (field: string, value: string) => {
@@ -61,42 +53,40 @@ function NewCardForm() {
       alert(`作成失敗: ${error.message}`);
       setIsSubmitting(false);
     } else {
-      alert("名刺を登録しました！パスワードは忘れないようにしてください。");
+      alert("名刺を登録しました！");
       router.push(`/card/${profile.card_id}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white pb-20">
+    <div className="min-h-screen bg-neutral-950 text-white pb-20 font-sans">
       <header className="p-6 border-b border-neutral-800 text-center font-bold">初期セットアップ</header>
       <main className="p-6 max-w-md mx-auto">
-        <div className="mb-8 p-4 bg-blue-900/20 border border-blue-800 rounded-xl text-center">
-          <p className="text-xs text-blue-300 mb-1 font-bold">割り当てられたID</p>
-          <p className="text-lg font-mono text-white">{profile.card_id || "IDを取得中..."}</p>
-        </div>
-
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">セキュリティ設定</h2>
-          <InputField label="編集用パスワード（必須）" value={profile.password} field="password" type="password" placeholder="今後、情報を直す際に必要です" onChange={handleChange} />
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">セキュリティ</h2>
+          <InputField label="パスワード（必須）" value={profile.password} field="password" type="password" onChange={handleChange} />
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">基本情報</h2>
-          <InputField label="氏名（必須）" value={profile.full_name} field="full_name" onChange={handleChange} placeholder="山田 太郎" />
-          <InputField label="役職" value={profile.job_title} field="job_title" onChange={handleChange} placeholder="営業部" />
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">基本情報</h2>
+          <InputField label="氏名（必須）" value={profile.full_name} field="full_name" onChange={handleChange} />
+          <InputField label="役職" value={profile.job_title} field="job_title" onChange={handleChange} />
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">連絡先・SNS</h2>
-          <InputField label="電話番号" value={profile.phone} field="phone" onChange={handleChange} />
-          <InputField label="メールアドレス" value={profile.email} field="email" onChange={handleChange} />
-          <InputField label="LINE ID" value={profile.line_id} field="line_id" onChange={handleChange} />
-          <InputField label="Instagram ID" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
-          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" onChange={handleChange} />
-          <InputField label="Webサイト" value={profile.website_url} field="website_url" onChange={handleChange} />
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-blue-400">スキル・資格</h2>
+          <InputField label="保有資格" value={profile.certifications} field="certifications" onChange={handleChange} />
+          <InputField label="スキル" value={profile.skills} field="skills" onChange={handleChange} />
         </section>
 
-        <button onClick={handleCreate} disabled={issubmitting} className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+        <section className="mb-8">
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-emerald-400">SNS・動画</h2>
+          <InputField label="YouTube" value={profile.youtube_id} field="youtube_id" placeholder="@channel" onChange={handleChange} />
+          <InputField label="TikTok" value={profile.tiktok_id} field="tiktok_id" placeholder="ID" onChange={handleChange} />
+          <InputField label="Instagram" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
+        </section>
+
+        <button onClick={handleCreate} disabled={issubmitting} className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-lg">
           {issubmitting ? "登録中..." : "この内容で登録する"}
         </button>
       </main>
