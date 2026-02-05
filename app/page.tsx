@@ -40,7 +40,7 @@ export default function HomePage() {
             onChange={(e) => setCardId(e.target.value)}
           />
           <button type="submit" className="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-neutral-200 active:scale-95 transition-all text-lg">
-            ダッシュボードへ
+            ログイン
           </button>
         </form>
 
