@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { Edit3, BarChart2, Lock, ArrowLeft, Eye, LogOut } from "lucide-react";
+import { Edit3, BarChart2, Lock, ArrowLeft, Eye, LogOut, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,6 +45,7 @@ export default function Dashboard() {
         <div className="hidden md:block p-6 mb-6 text-xl font-bold italic tracking-tighter text-blue-500">SMART CARD</div>
         
         <NavButton active={activeTab === "analytics"} onClick={() => setActiveTab("analytics")} icon={<BarChart2 />} label="分析" />
+        <NavButton active={activeTab === "share"} onClick={() => setActiveTab("share")} icon={<QrCode />} label="共有" />
         <NavButton active={activeTab === "edit"} onClick={() => setActiveTab("edit")} icon={<Edit3 />} label="編集" />
         <NavButton active={activeTab === "password"} onClick={() => setActiveTab("password")} icon={<Lock />} label="パス設定" />
         
@@ -59,28 +61,19 @@ export default function Dashboard() {
 
       {/* メインエリア */}
       <main className="pb-24 md:pl-72 p-6 max-w-4xl mx-auto pt-10">
-        <h1 className="text-2xl font-bold mb-2">こんにちは、{profile.full_name}さん</h1>
-        <p className="text-gray-500 mb-8 text-sm">ID: {profile.card_id}</p>
+        <h1 className="text-2xl font-bold mb-2 text-center md:text-left">こんにちは、{profile.full_name}さん</h1>
+        <p className="text-gray-500 mb-8 text-sm text-center md:text-left">ID: {profile.card_id}</p>
 
         {activeTab === "analytics" && <AnalyticsView profile={profile} />}
-        
-        {activeTab === "edit" && (
-           <div className="animate-in fade-in">
-             <h2 className="text-2xl font-bold mb-6">情報の編集</h2>
-             <button onClick={() => router.push(`/card/${profile.card_id}/edit`)} className="w-full bg-neutral-800 border border-neutral-700 p-8 rounded-2xl hover:bg-neutral-700 transition-all flex items-center justify-between group">
-               <span className="font-bold text-lg">編集ページを開く</span>
-               <Edit3 className="group-hover:text-blue-400 transition-colors" />
-             </button>
-           </div>
-        )}
-
+        {activeTab === "share" && <ShareView profile={profile} />}
+        {activeTab === "edit" && <EditLinkView profile={profile} />}
         {activeTab === "password" && <PasswordView profile={profile} />}
       </main>
     </div>
   );
 }
 
-// --- コンポーネント群 ---
+// --- 各表示コンポーネント ---
 
 function AnalyticsView({ profile }: any) {
   return (
@@ -94,6 +87,48 @@ function AnalyticsView({ profile }: any) {
           <span className="text-gray-500 text-sm mt-2">累計表示回数</span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ShareView({ profile }: any) {
+  // ブラウザ上でのみURLを生成
+  const cardUrl = typeof window !== "undefined" ? `${window.location.origin}/card/${profile.card_id}` : "";
+
+  return (
+    <div className="animate-in zoom-in-95 duration-500 flex flex-col items-center">
+      <h2 className="text-2xl font-bold mb-6 self-start">名刺を共有</h2>
+      <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl mb-8">
+        <QRCodeSVG value={cardUrl} size={200} level="H" />
+      </div>
+      <div className="w-full max-w-sm space-y-4">
+        <div className="bg-neutral-900 border border-neutral-800 p-4 rounded-2xl flex items-center justify-between overflow-hidden">
+          <span className="text-xs text-gray-500 truncate mr-2 italic">{cardUrl}</span>
+          <button 
+            onClick={() => { navigator.clipboard.writeText(cardUrl); alert("URLをコピーしました！"); }} 
+            className="bg-blue-600 px-4 py-2 rounded-xl text-xs font-bold shrink-0"
+          >
+            コピー
+          </button>
+        </div>
+        <p className="text-gray-400 text-sm text-center">QRコードをスキャンしてもらうだけで、<br/>連絡先を瞬時に伝えられます。</p>
+      </div>
+    </div>
+  );
+}
+
+function EditLinkView({ profile }: any) {
+  const router = useRouter();
+  return (
+    <div className="animate-in fade-in">
+      <h2 className="text-2xl font-bold mb-6">情報の編集</h2>
+      <button onClick={() => router.push(`/card/${profile.card_id}/edit`)} className="w-full bg-neutral-900 border border-neutral-800 p-8 rounded-[2rem] hover:border-blue-500 transition-all flex items-center justify-between group text-left">
+        <div>
+          <span className="font-bold text-lg block">プロフィールを更新</span>
+          <span className="text-sm text-gray-500">SNSやスキル情報を変更できます</span>
+        </div>
+        <Edit3 className="group-hover:text-blue-400 transition-colors" size={28} />
+      </button>
     </div>
   );
 }
