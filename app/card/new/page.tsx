@@ -26,15 +26,15 @@ export default function NewCard() {
   const [issubmitting, setIsSubmitting] = useState(false);
   
   const [profile, setProfile] = useState({
-    card_id: "", // ここが新しい名刺のURLになるID
+    card_id: "", 
     full_name: "",
     job_title: "",
     phone: "",
     email: "",
     line_id: "",
     instagram_id: "",
-    x_id: "",
-    website_url: "",
+    x_id: "", // 追加
+    website_url: "", // 追加
   });
 
   const handleChange = (field: string, value: string) => {
@@ -48,7 +48,6 @@ export default function NewCard() {
     }
 
     setIsSubmitting(true);
-    // Supabaseに新しい行を追加 (insert)
     const { error } = await supabase.from("profiles").insert([profile]);
 
     if (error) {
@@ -67,16 +66,15 @@ export default function NewCard() {
       </header>
 
       <main className="p-6 max-w-md mx-auto">
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 italic text-blue-400">重要設定</h2>
+        <section className="mb-8 border-l-4 border-blue-600 pl-4">
+          <h2 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">重要設定</h2>
           <InputField 
-            label="名刺ID (URLになります)" 
+            label="名刺ID (URLの一部になります)" 
             value={profile.card_id} 
             field="card_id" 
-            placeholder="例: tanaka-01 (半角英数字)" 
+            placeholder="例: sato-01 (半角英数字)" 
             onChange={handleChange} 
           />
-          <p className="text-xs text-gray-500 mt-1 mb-4">※このIDは他と被らないようにしてください。</p>
         </section>
 
         <section className="mb-8">
@@ -91,12 +89,15 @@ export default function NewCard() {
           <InputField label="メールアドレス" value={profile.email} field="email" onChange={handleChange} />
           <InputField label="LINE ID" value={profile.line_id} field="line_id" onChange={handleChange} />
           <InputField label="Instagram ID" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
+          {/* ↓ ここに追加したフィールドを表示 ↓ */}
+          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" placeholder="ユーザー名のみ" onChange={handleChange} />
+          <InputField label="WebサイトURL" value={profile.website_url} field="website_url" placeholder="https://..." onChange={handleChange} />
         </section>
         
         <button 
           onClick={handleCreate} 
           disabled={issubmitting}
-          className={`w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-transform ${issubmitting ? 'opacity-50' : ''}`}
+          className={`w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all ${issubmitting ? 'opacity-50' : ''}`}
         >
           {issubmitting ? "作成中..." : "名刺を発行する"}
         </button>
