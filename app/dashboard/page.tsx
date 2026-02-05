@@ -48,10 +48,10 @@ export default function Dashboard() {
         <NavButton active={activeTab === "password"} onClick={() => setActiveTab("password")} icon={<Lock />} label="パス設定" />
         
         <div className="md:mt-auto md:border-t md:border-neutral-800 md:pt-4">
-          <button onClick={() => router.push(`/card/${profile.card_id}`)} className="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors w-full">
+          <button onClick={() => router.push(`/card/${profile.card_id}`)} className="flex items-center gap-3 p-4 text-gray-400 hover:text-white transition-colors w-full text-left">
             <ArrowLeft size={20} /> <span className="hidden md:inline">名刺を見る</span>
           </button>
-          <button onClick={handleLogout} className="flex items-center gap-3 p-4 text-red-400 hover:text-red-300 transition-colors w-full">
+          <button onClick={handleLogout} className="flex items-center gap-3 p-4 text-red-400 hover:text-red-300 transition-colors w-full text-left">
             <LogOut size={20} /> <span className="hidden md:inline">ログアウト</span>
           </button>
         </div>
@@ -63,6 +63,7 @@ export default function Dashboard() {
         <p className="text-gray-500 mb-8 text-sm">ID: {profile.card_id}</p>
 
         {activeTab === "analytics" && <AnalyticsView profile={profile} />}
+        
         {activeTab === "edit" && (
            <div className="animate-in fade-in">
              <h2 className="text-2xl font-bold mb-6">情報の編集</h2>
@@ -72,11 +73,14 @@ export default function Dashboard() {
              </button>
            </div>
         )}
+
         {activeTab === "password" && <PasswordView profile={profile} />}
       </main>
     </div>
   );
 }
+
+// --- コンポーネント群 ---
 
 function AnalyticsView({ profile }: any) {
   return (
@@ -95,26 +99,48 @@ function AnalyticsView({ profile }: any) {
 }
 
 function PasswordView({ profile }: any) {
+  const [currentPass, setCurrentPass] = useState("");
   const [newPass, setNewPass] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const handleUpdate = async () => {
+    if (currentPass !== profile.password) {
+      alert("現在のパスワードが正しくありません。");
+      return;
+    }
+    if (!newPass) {
+      alert("新しいパスワードを入力してください。");
+      return;
+    }
+
+    setIsUpdating(true);
     const { error } = await supabase.from("profiles").update({ password: newPass }).eq("card_id", profile.card_id);
-    if (error) alert("更新失敗");
-    else { alert("パスワードを変更しました"); setNewPass(""); }
+
+    if (error) {
+      alert("更新に失敗しました。");
+    } else {
+      alert("パスワードを変更しました。");
+      setCurrentPass("");
+      setNewPass("");
+      profile.password = newPass; 
+    }
+    setIsUpdating(false);
   };
 
   return (
     <div className="max-w-md animate-in slide-in-from-bottom-4 duration-500">
       <h2 className="text-2xl font-bold mb-6">パスワード変更</h2>
-      <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-3xl">
-        <input 
-          type="password" 
-          placeholder="新しいパスワード" 
-          className="w-full bg-neutral-800 p-4 rounded-xl mb-4 border border-neutral-700 outline-none focus:border-blue-500 text-white"
-          value={newPass}
-          onChange={(e) => setNewPass(e.target.value)}
-        />
-        <button onClick={handleUpdate} className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 transition-colors">
-          変更を保存
+      <div className="bg-neutral-900 border border-neutral-800 p-6 rounded-3xl text-left">
+        <div className="mb-4">
+          <label className="text-xs text-gray-500 ml-1 mb-1 block">現在のパスワード</label>
+          <input type="password" placeholder="••••••••" className="w-full bg-neutral-800 p-4 rounded-xl border border-neutral-700 outline-none focus:border-blue-500 text-white" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} />
+        </div>
+        <div className="mb-6">
+          <label className="text-xs text-gray-500 ml-1 mb-1 block">新しいパスワード</label>
+          <input type="password" placeholder="••••••••" className="w-full bg-neutral-800 p-4 rounded-xl border border-neutral-700 outline-none focus:border-blue-500 text-white" value={newPass} onChange={(e) => setNewPass(e.target.value)} />
+        </div>
+        <button onClick={handleUpdate} disabled={isUpdating} className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 transition-colors disabled:opacity-50">
+          {isUpdating ? "更新中..." : "パスワードを更新する"}
         </button>
       </div>
     </div>
