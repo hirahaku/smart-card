@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { redirect } from 'next/navigation'; // ★これが必要です！
 // @ts-ignore
 import vCardsJS from 'vcards-js';
 import { User, Instagram, Mail, Phone, Download, Globe, MessageCircle, Send } from 'lucide-react';
@@ -18,6 +19,7 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
     .eq('card_id', id)
     .single();
 
+  // データがない場合は新規作成画面へ
   if (!profile || error) {
     redirect(`/card/new?id=${id}`); 
   }
@@ -43,13 +45,11 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
         </div>
 
         <div className="space-y-3">
-          {/* メインのアクション: 連絡先保存 */}
           <a href={vCardData} download="contact.vcf" className="flex items-center justify-center gap-3 w-full bg-white text-black py-4 rounded-2xl font-bold hover:bg-neutral-200 transition-colors">
             <Download size={20} /> 連絡先を保存
           </a>
 
           <div className="grid grid-cols-1 gap-3">
-            {/* 電話 */}
             {profile.phone && (
               <a href={`tel:${profile.phone}`} className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <Phone size={20} className="text-blue-400" />
@@ -57,7 +57,6 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
               </a>
             )}
 
-            {/* メール */}
             {profile.email && (
               <a href={`mailto:${profile.email}`} className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <Mail size={20} className="text-emerald-400" />
@@ -65,7 +64,6 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
               </a>
             )}
 
-            {/* LINE */}
             {profile.line_id && (
               <a href={`https://line.me/ti/p/~${profile.line_id}`} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <MessageCircle size={20} className="text-green-500" />
@@ -73,7 +71,6 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
               </a>
             )}
 
-            {/* Instagram */}
             {profile.instagram_id && (
               <a href={`https://instagram.com/${profile.instagram_id}`} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <Instagram size={20} className="text-pink-500" />
@@ -81,7 +78,6 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
               </a>
             )}
 
-            {/* X (Twitter) */}
             {profile.x_id && (
               <a href={`https://x.com/${profile.x_id}`} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <Send size={20} className="text-sky-400" />
@@ -89,7 +85,6 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
               </a>
             )}
 
-            {/* Webサイト */}
             {profile.website_url && (
               <a href={profile.website_url} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
                 <Globe size={20} className="text-indigo-400" />
