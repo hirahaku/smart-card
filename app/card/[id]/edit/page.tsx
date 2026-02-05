@@ -30,6 +30,7 @@ export default function EditCard() {
 
   useEffect(() => {
     async function loadProfile() {
+      // 編集時はパスワード照合のためpasswordカラムも取得する
       const { data } = await supabase.from("profiles").select("*").eq("card_id", id).single();
       if (data) setProfile(data);
       setLoading(false);
@@ -50,7 +51,7 @@ export default function EditCard() {
     if (error) alert("保存失敗");
     else {
       alert("更新しました！");
-      router.push(`/card/${id}`);
+      router.push(`/dashboard`); // 編集後はダッシュボードに戻す
     }
   };
 
@@ -65,7 +66,7 @@ export default function EditCard() {
 
       <main className="p-6 max-w-md mx-auto">
         <section className="mb-10 p-5 bg-red-950/20 border border-red-900/30 rounded-3xl">
-          <InputField label="編集用パスワード" value={inputPassword} field="password" type="password" onChange={(_:any, v:string) => setInputPassword(v)} />
+          <InputField label="編集用パスワード（必須）" value={inputPassword} field="password" type="password" onChange={(_:any, v:string) => setInputPassword(v)} />
         </section>
 
         <section className="mb-8">
@@ -82,16 +83,16 @@ export default function EditCard() {
 
         <section className="mb-8">
           <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 text-emerald-400">SNS・動画</h2>
+          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" placeholder="@なしのIDのみ" onChange={handleChange} />
           <InputField label="YouTubeチャンネルID" value={profile.youtube_id} field="youtube_id" placeholder="@channel_id" onChange={handleChange} />
           <InputField label="TikTok ID" value={profile.tiktok_id} field="tiktok_id" placeholder="ユーザー名のみ" onChange={handleChange} />
           <InputField label="Instagram ID" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
-          <InputField label="X ID" value={profile.x_id} field="x_id" onChange={handleChange} />
           <InputField label="LINE ID" value={profile.line_id} field="line_id" onChange={handleChange} />
           <InputField label="電話番号" value={profile.phone} field="phone" onChange={handleChange} />
           <InputField label="Webサイト" value={profile.website_url} field="website_url" onChange={handleChange} />
         </section>
         
-        <button onClick={handleSave} className="w-full bg-white text-black font-black py-4 rounded-2xl">保存する</button>
+        <button onClick={handleSave} className="w-full bg-white text-black font-black py-4 rounded-2xl mb-10">保存する</button>
       </main>
     </div>
   );

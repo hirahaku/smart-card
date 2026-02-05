@@ -2,8 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 // @ts-ignore
 import vCardsJS from 'vcards-js';
-// Twitterアイコンを追加
-import { User, Instagram, Mail, Phone, Download, Globe, MessageCircle, Send, Award, Youtube, Video, Twitter } from 'lucide-react';
+import { User, Instagram, Phone, Download, Globe, MessageCircle, Award, Youtube, Video, Twitter } from 'lucide-react';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -11,8 +10,18 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
   const params = await props.params;
   const id = params.id;
 
-  const { data: profile, error } = await supabase.from('profiles').select('*').eq('card_id', id).single();
+  // 1. プロフィール取得 (passwordは取得しない)
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('card_id, full_name, job_title, phone, email, line_id, instagram_id, x_id, website_url, tiktok_id, youtube_id, skills, certifications, views_count')
+    .eq('card_id', id)
+    .single();
+  
   if (!profile || error) redirect(`/card/new?id=${id}`);
+
+  // 2. 閲覧数を+1 (エラーハンドリング付き)
+  const { error: rpcError } = await supabase.rpc('increment_views', { row_id: id });
+  if (rpcError) console.error("Analytics Error:", rpcError);
 
   // vCard生成
   // @ts-ignore
@@ -27,34 +36,32 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
     <div className="min-h-screen bg-neutral-950 text-neutral-200 font-sans pb-20">
       <main className="max-w-md mx-auto pt-16 px-6">
         <div className="text-center mb-10">
-          <div className="w-24 h-24 bg-neutral-800 rounded-3xl mx-auto mb-4 flex items-center justify-center border border-neutral-700">
+          <div className="w-24 h-24 bg-neutral-800 rounded-3xl mx-auto mb-4 flex items-center justify-center border border-neutral-700 shadow-xl">
             <User size={40} className="text-neutral-500" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-1">{profile.full_name}</h1>
-          <p className="text-blue-400 text-sm font-medium">{profile.job_title}</p>
+          <p className="text-blue-400 text-sm font-medium tracking-wide uppercase">{profile.job_title}</p>
         </div>
 
         {/* スキル・資格セクション */}
         {(profile.certifications || profile.skills) && (
           <div className="mb-8 p-5 bg-neutral-900/50 border border-neutral-800 rounded-3xl">
-            <div className="flex items-center gap-2 mb-3 text-xs font-bold text-gray-500 uppercase tracking-widest">
+            <div className="flex items-center gap-2 mb-3 text-xs font-bold text-neutral-500 uppercase tracking-widest">
               <Award size={14} /> Skills & Certs
             </div>
-            {profile.certifications && <p className="text-sm text-white mb-2">● {profile.certifications}</p>}
-            {profile.skills && <p className="text-sm text-gray-400">● {profile.skills}</p>}
+            {profile.certifications && <p className="text-sm text-white mb-2 font-medium">● {profile.certifications}</p>}
+            {profile.skills && <p className="text-sm text-neutral-400 italic">● {profile.skills}</p>}
           </div>
         )}
 
         <div className="space-y-3">
-          <a href={vCardData} download="contact.vcf" className="flex items-center justify-center gap-3 w-full bg-white text-black py-4 rounded-2xl font-bold mb-6">
+          <a href={vCardData} download="contact.vcf" className="flex items-center justify-center gap-3 w-full bg-white text-black py-4 rounded-2xl font-bold mb-6 hover:bg-neutral-200 transition-colors shadow-lg active:scale-95 transition-all">
             <Download size={20} /> 連絡先を保存
           </a>
 
-          {/* SNSボタン群 */}
           <div className="grid grid-cols-1 gap-3">
             {profile.phone && <LinkButton href={`tel:${profile.phone}`} icon={<Phone size={20} className="text-blue-400" />} label="電話をかける" />}
             
-            {/* ★ ここを追加しました：X (Twitter) */}
             {profile.x_id && (
               <LinkButton 
                 href={`https://x.com/${profile.x_id}`} 
@@ -76,7 +83,7 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
 }
 
 const LinkButton = ({ href, icon, label }: any) => (
-  <a href={href} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all">
+  <a href={href} target="_blank" className="flex items-center gap-4 bg-neutral-900 border border-neutral-800 p-4 rounded-2xl hover:bg-neutral-800 transition-all active:scale-[0.98]">
     {icon}
     <span className="flex-1 font-medium">{label}</span>
   </a>

@@ -43,8 +43,8 @@ function NewCardForm() {
   };
 
   const handleCreate = async () => {
-    if (!profile.full_name || !profile.password) {
-      alert("氏名とパスワードは必須です");
+    if (!profile.full_name || !profile.password || !profile.card_id) {
+      alert("ID、氏名、パスワードは必須です");
       return;
     }
     setIsSubmitting(true);
@@ -53,8 +53,9 @@ function NewCardForm() {
       alert(`作成失敗: ${error.message}`);
       setIsSubmitting(false);
     } else {
-      alert("名刺を登録しました！");
-      router.push(`/card/${profile.card_id}`);
+      // 作成成功したら、そのIDで自動ログイン扱いにしてダッシュボードへ
+      localStorage.setItem("login_card_id", profile.card_id);
+      router.push(`/dashboard`);
     }
   };
 
@@ -63,30 +64,25 @@ function NewCardForm() {
       <header className="p-6 border-b border-neutral-800 text-center font-bold">初期セットアップ</header>
       <main className="p-6 max-w-md mx-auto">
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">セキュリティ</h2>
-          <InputField label="パスワード（必須）" value={profile.password} field="password" type="password" onChange={handleChange} />
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">必須情報</h2>
+          <InputField label="カードID (英数字)" value={profile.card_id} field="card_id" onChange={handleChange} />
+          <InputField label="パスワード" value={profile.password} field="password" type="password" onChange={handleChange} />
+          <InputField label="氏名" value={profile.full_name} field="full_name" onChange={handleChange} />
         </section>
 
         <section className="mb-8">
           <h2 className="text-xs font-bold text-gray-500 uppercase mb-4">基本情報</h2>
-          <InputField label="氏名（必須）" value={profile.full_name} field="full_name" onChange={handleChange} />
           <InputField label="役職" value={profile.job_title} field="job_title" onChange={handleChange} />
         </section>
 
         <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-blue-400">スキル・資格</h2>
-          <InputField label="保有資格" value={profile.certifications} field="certifications" onChange={handleChange} />
-          <InputField label="スキル" value={profile.skills} field="skills" onChange={handleChange} />
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-emerald-400">SNS・動画</h2>
-          <InputField label="YouTube" value={profile.youtube_id} field="youtube_id" placeholder="@channel" onChange={handleChange} />
-          <InputField label="TikTok" value={profile.tiktok_id} field="tiktok_id" placeholder="ID" onChange={handleChange} />
+          <h2 className="text-xs font-bold text-gray-500 uppercase mb-4 text-emerald-400">SNS・連絡先</h2>
+          <InputField label="X (Twitter) ID" value={profile.x_id} field="x_id" placeholder="@なし" onChange={handleChange} />
           <InputField label="Instagram" value={profile.instagram_id} field="instagram_id" onChange={handleChange} />
+          <InputField label="Webサイト" value={profile.website_url} field="website_url" onChange={handleChange} />
         </section>
 
-        <button onClick={handleCreate} disabled={issubmitting} className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-lg">
+        <button onClick={handleCreate} disabled={issubmitting} className="w-full bg-white text-black font-black py-4 rounded-2xl shadow-lg hover:bg-neutral-200 transition-colors">
           {issubmitting ? "登録中..." : "この内容で登録する"}
         </button>
       </main>

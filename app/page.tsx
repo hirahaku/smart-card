@@ -8,7 +8,12 @@ export default function HomePage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (cardId) router.push(`/card/${cardId}/edit`);
+    if (cardId) {
+      // 1. ログイン中のIDをブラウザに保存（ダッシュボードで使用）
+      localStorage.setItem("login_card_id", cardId);
+      // 2. ダッシュボードへ遷移
+      router.push(`/dashboard`);
+    }
   };
 
   return (
@@ -22,7 +27,7 @@ export default function HomePage() {
       <main className="w-full max-w-md bg-neutral-900 border border-neutral-800 p-8 rounded-[2.5rem] shadow-2xl">
         <div className="mb-8 text-center">
           <h2 className="text-xl font-bold mb-2">マイページにログイン</h2>
-          <p className="text-sm text-gray-400">カードIDを入力して編集画面を開きます</p>
+          <p className="text-sm text-gray-400">カードIDを入力して管理画面を開きます</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -30,14 +35,21 @@ export default function HomePage() {
             type="text" 
             placeholder="例: test001"
             required
-            className="w-full bg-neutral-800 border border-neutral-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg font-mono"
+            className="w-full bg-neutral-800 border border-neutral-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg font-mono text-white"
             value={cardId}
             onChange={(e) => setCardId(e.target.value)}
           />
           <button type="submit" className="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-neutral-200 active:scale-95 transition-all text-lg">
-            編集画面へ
+            ダッシュボードへ
           </button>
         </form>
+
+        <div className="mt-8 pt-6 border-t border-neutral-800 text-center">
+           <p className="text-xs text-gray-500 leading-relaxed">
+             カードをまだお持ちでない方は<br />
+             <a href="/card/new" className="text-blue-400 underline">こちらから新規登録</a>
+           </p>
+         </div>
       </main>
       <footer className="mt-12 text-gray-600 text-[10px] tracking-widest uppercase">© 2026 Smart Card Project</footer>
     </div>
