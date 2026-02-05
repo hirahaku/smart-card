@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+// @ts-ignore
 import vCardsJS from 'vcards-js';
 import { User, Briefcase, Globe, Instagram, Mail, Phone, Download } from 'lucide-react';
 
@@ -31,6 +32,7 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
   }
 
   // vCard生成
+  // @ts-ignore
   const vCard = vCardsJS();
   vCard.firstName = profile.full_name;
   vCard.organization = profile.job_title;
