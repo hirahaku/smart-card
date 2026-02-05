@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 // @ts-ignore
 import vCardsJS from 'vcards-js';
-import { User, Instagram, Mail, Phone, Download, Globe, MessageCircle, Send, Award, Youtube, Video } from 'lucide-react';
+// Twitterアイコンを追加
+import { User, Instagram, Mail, Phone, Download, Globe, MessageCircle, Send, Award, Youtube, Video, Twitter } from 'lucide-react';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -52,6 +53,16 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
           {/* SNSボタン群 */}
           <div className="grid grid-cols-1 gap-3">
             {profile.phone && <LinkButton href={`tel:${profile.phone}`} icon={<Phone size={20} className="text-blue-400" />} label="電話をかける" />}
+            
+            {/* ★ ここを追加しました：X (Twitter) */}
+            {profile.x_id && (
+              <LinkButton 
+                href={`https://x.com/${profile.x_id}`} 
+                icon={<Twitter size={20} className="text-white" />} 
+                label="X (Twitter)" 
+              />
+            )}
+
             {profile.youtube_id && <LinkButton href={`https://youtube.com/${profile.youtube_id}`} icon={<Youtube size={20} className="text-red-500" />} label="YouTube" />}
             {profile.tiktok_id && <LinkButton href={`https://tiktok.com/@${profile.tiktok_id}`} icon={<Video size={20} className="text-pink-500" />} label="TikTok" />}
             {profile.instagram_id && <LinkButton href={`https://instagram.com/${profile.instagram_id}`} icon={<Instagram size={20} className="text-purple-400" />} label="Instagram" />}
