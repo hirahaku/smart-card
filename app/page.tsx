@@ -35,7 +35,7 @@ export default function HomePage() {
             <label className="block text-xs font-bold text-gray-500 uppercase ml-1 mb-2">Card ID</label>
             <input 
               type="text" 
-              placeholder="例: test001"
+              placeholder="例: 012345"
               required
               className="w-full bg-neutral-800 border border-neutral-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-lg font-mono"
               value={cardId}
