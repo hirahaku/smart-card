@@ -18,13 +18,8 @@ export default async function CardPage(props: { params: Promise<{ id: string }> 
     .eq('card_id', id)
     .single();
 
-  if (!profile) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6 text-center">
-        <h1 className="text-xl font-bold mb-4">名刺が見つかりません</h1>
-        <p className="text-gray-400">URL: /card/{id}</p>
-      </div>
-    );
+  if (!profile || error) {
+    redirect(`/card/new?id=${id}`); 
   }
 
   // vCard生成
