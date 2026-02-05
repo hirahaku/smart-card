@@ -76,7 +76,7 @@ export default function NewCard() {
             placeholder="例: tanaka-01 (半角英数字)" 
             onChange={handleChange} 
           />
-          <p className="text-xs text-gray-500 mt-1 mb-4">※このIDが /card/◯◯ の部分に使われます。他と被らないようにしてください。</p>
+          <p className="text-xs text-gray-500 mt-1 mb-4">※このIDは他と被らないようにしてください。</p>
         </section>
 
         <section className="mb-8">
